@@ -1,12 +1,11 @@
 CC=gcc
 FILES=./src/*.c
 EXE=renderer
-SDL=`sdl-config --cflags --libs`
 
 all: build run clean
 
 build:
-	$(CC) $(FILES) -o $(EXE) $(SDL)
+	$(CC) $(FILES) -o $(EXE) $(shell pkg-config --cflags --libs sdl2) 
 
 run:
 	./$(EXE)

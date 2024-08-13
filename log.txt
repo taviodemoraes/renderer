@@ -1,2 +1,5 @@
-day 1
-- project structure 
+day 1 (09/08/2024)
+- project structure
+
+day (12/08/2024)
+- draw a pixel function (essential for draw_line function)

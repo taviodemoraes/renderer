@@ -5,7 +5,7 @@ EXE=renderer
 all: build run clean
 
 build:
-	$(CC) $(FILES) -o $(EXE) $(shell pkg-config --cflags --libs sdl2) 
+	$(CC) $(FILES) -o $(EXE) $(shell pkg-config --cflags --libs sdl2) -lm 
 
 run:
 	./$(EXE)

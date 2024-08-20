@@ -1,12 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <math.h>
 
 #include <SDL.h>
 
 #define WINDOW_WIDTH 	640
 #define WINDOW_HEIGHT	320
+
+bool should_quit = false;
+
+typedef struct {
+	SDL_Window *window;
+	SDL_Renderer *renderer;
+} sdl_t;
+
+void init_sdl(sdl_t *sdl) {
+	SDL_Init(SDL_INIT_EVERYTHING);
+	sdl->window = SDL_CreateWindow("renderer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
+	sdl->renderer = SDL_CreateRenderer(sdl->window, -1, SDL_RENDERER_ACCELERATED);
+}
 
 void draw_pixel(SDL_Renderer *renderer, int x, int y, uint32_t color) {
 	SDL_SetRenderDrawColor(renderer, (color >> 24), (color >> 16), (color >> 8), (color >> 0));
@@ -55,15 +69,48 @@ void draw_line(SDL_Renderer *renderer, int x0, int y0, int x1, int y1) {
 	}	
 }
 
-int main(void) {
-	SDL_Init(SDL_INIT_EVERYTHING);
-	SDL_Window *window = SDL_CreateWindow("renderer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
-	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-	draw_line(renderer, 0, 0, 320, 320);
-	SDL_RenderPresent(renderer);
-	SDL_Delay(5000);
+
+void draw_triangle(SDL_Renderer *renderer) {
+	// max_y = 320, max_x = 640
+	// Calculate vertex for a trinagle in the mid of screen 
+	const int center_x = WINDOW_WIDTH / 2;
+	const int center_y = WINDOW_HEIGHT / 2;
+	const int side_length = 320;
+	const int height_length = (sqrt(3) / 2) * side_length;
+	const int vertex1[2] = {center_x, center_y - height_length / 2};
+	const int vertex2[2] = {center_x - side_length / 2, center_y + height_length / 2};
+	const int vertex3[2] = {center_x + side_length / 2, center_y + height_length / 2};	
+	draw_line(renderer, vertex1[0], vertex1[1], vertex2[0], vertex2[1]);
+	draw_line(renderer, vertex2[0], vertex2[1], vertex3[0], vertex3[1]);
+	draw_line(renderer, vertex3[0], vertex3[1], vertex1[0], vertex1[1]);
+}
+
+void handle_events(void) {
+	SDL_Event e;
+	while (SDL_PollEvent(&e)) {
+		if (e.type == SDL_QUIT) {
+			should_quit = true;
+		}
+	}
+}
+
+void destroy_sdl(SDL_Renderer *renderer, SDL_Window *window) {
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
+}
+
+int main(void) {
+	sdl_t sdl = {0};
+	init_sdl(&sdl);
+
+	while (!should_quit) {
+		handle_events();
+		// Rendering
+		draw_triangle(sdl.renderer);
+		SDL_RenderPresent(sdl.renderer);
+	}
+	
+	destroy_sdl(sdl.renderer, sdl.window);
 	exit(EXIT_SUCCESS);
 }

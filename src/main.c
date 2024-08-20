@@ -4,22 +4,39 @@
 #include <stdbool.h>
 #include <math.h>
 
-#include <SDL.h>
+#include "SDL.h"
 
 #define WINDOW_WIDTH 	640
 #define WINDOW_HEIGHT	320
 
 bool should_quit = false;
 
+// SDL Object
 typedef struct {
 	SDL_Window *window;
 	SDL_Renderer *renderer;
 } sdl_t;
 
-void init_sdl(sdl_t *sdl) {
-	SDL_Init(SDL_INIT_EVERYTHING);
-	sdl->window = SDL_CreateWindow("renderer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
-	sdl->renderer = SDL_CreateRenderer(sdl->window, -1, SDL_RENDERER_ACCELERATED);
+// Init of SDL systems
+bool init_sdl(sdl_t *sdl) {
+	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+		SDL_Log("Could not init SDL systems! %s\n", SDL_GetError());
+		return false;
+	}
+	
+	sdl->window = SDL_CreateWindow("renderer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);	
+	if (!sdl->window) {
+		SDL_Log("Could not create SDL window! %s\n", SDL_GetError());
+		return false;
+	}
+
+	sdl->renderer = SDL_CreateRenderer(sdl->window, -1, SDL_RENDERER_PRESENTVSYNC);
+	if (!sdl->renderer) {
+		SDL_Log("Could not create SDL renderer! %s\n", SDL_GetError());
+		return false;
+	}
+
+	return true;
 }
 
 void draw_pixel(SDL_Renderer *renderer, int x, int y, uint32_t color) {
@@ -100,9 +117,9 @@ void destroy_sdl(SDL_Renderer *renderer, SDL_Window *window) {
 	SDL_Quit();
 }
 
-int main(void) {
+int main(int argc, char **argv) {
 	sdl_t sdl = {0};
-	init_sdl(&sdl);
+	if (!init_sdl(&sdl)) exit(EXIT_FAILURE);
 
 	while (!should_quit) {
 		handle_events();

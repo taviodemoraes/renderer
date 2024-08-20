@@ -15,6 +15,7 @@ void draw_pixel(SDL_Renderer *renderer, int x, int y, uint32_t color) {
 
 /*
  * Bresenham's Line Algorithm
+ * Draw lines by adjusting the line to the straightest possible line between two points
  * x0,y0: start point
  * x1,y1: end point
 */
@@ -25,9 +26,9 @@ void draw_line(SDL_Renderer *renderer, int x0, int y0, int x1, int y1) {
 
 	// Calculate the step direction (in x-direction and y-direction)	
 	const int sx = (x0 < x1) ? 1 : -1; // step x left or right
-	const int sy = (y0 < y1) ? 1 : -1; // step y left or right
+	const int sy = (y0 < y1) ? 1 : -1; // step y up or down
 
-	// Start state for difference between dx and dy
+	// Ideal difference of line
 	int err = dx - dy;
 
 	while(1) {
@@ -40,16 +41,16 @@ void draw_line(SDL_Renderer *renderer, int x0, int y0, int x1, int y1) {
 		// Update error term (look ahead)
 		int e2 = 2 * err;
 
-		// Update x-coordinate
+		// Adjust x-coordinate
 		if (e2 > -dy) {
-			err -= dy;
+			err -= dy; // adjust error term because the error is in x-coordinate
 			x0 += sx; // move x0 in the x direction setup in sx (left or right)
 		}
 
-		// Update y-coordinate
+		// Adjust y-coordinate
 		if (e2 < dx) {
-			err += dx;
-			y0 += sy; // move y0 in the y direction setup in sy (left or right)
+			err += dx; // adjust error term because the error is in y-coordinate
+			y0 += sy; // move y0 in the y direction setup in sy (up or down)
 		}
 	}	
 }
@@ -58,7 +59,7 @@ int main(void) {
 	SDL_Init(SDL_INIT_EVERYTHING);
 	SDL_Window *window = SDL_CreateWindow("renderer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
 	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-	draw_line(renderer, 0, 0, 10, 10);
+	draw_line(renderer, 0, 0, 320, 320);
 	SDL_RenderPresent(renderer);
 	SDL_Delay(5000);
 	SDL_DestroyRenderer(renderer);

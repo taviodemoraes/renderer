@@ -4,5 +4,8 @@ day 1 (09/08/2024)
 day 2 (12/08/2024)
 - draw a pixel function (essential for draw_line function)
 
-day (14/08/2024)
+day 3 (14/08/2024)
 - a naive, slow, flaw draw_line function
+
+day 4 (19/08/2024)
+- a better draw_line algorithm (bresenham algorithm) implemented

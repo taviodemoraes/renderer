@@ -9,3 +9,9 @@ day 3 (14/08/2024)
 
 day 4 (19/08/2024)
 - a better draw_line algorithm (bresenham algorithm) implemented
+
+day 5 (20/08/2024)
+- draw a triangle
+
+day 6 (21/08/2024)
+- improve the structure of project

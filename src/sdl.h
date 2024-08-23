@@ -1,3 +1,6 @@
+#ifndef SDL_H
+#define SDL_H
+
 #include <stdbool.h>
 
 #include "SDL.h"
@@ -15,3 +18,5 @@ typedef struct {
 bool init_sdl(sdl_t *sdl);
 // Exit & Destroy of SDL systems
 void destroy_sdl(SDL_Renderer *renderer, SDL_Window *window);
+
+#endif

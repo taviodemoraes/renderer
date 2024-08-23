@@ -15,3 +15,6 @@ day 5 (20/08/2024)
 
 day 6 (21/08/2024)
 - improve the structure of project
+
+day 7 (22/08/2024)
+- draw filled triangles

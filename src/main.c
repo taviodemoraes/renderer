@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
 	while (!should_quit) {
 		handle_events();
 		// Rendering
-		draw_triangle(sdl.renderer);
+		draw_filled_triangle(sdl.renderer);
 		SDL_RenderPresent(sdl.renderer);
 	}
 	

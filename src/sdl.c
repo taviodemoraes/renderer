@@ -1,6 +1,5 @@
 #include "sdl.h"
 
-// Init of SDL systems
 bool init_sdl(sdl_t *sdl) {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		SDL_Log("Could not init SDL systems! %s\n", SDL_GetError());
@@ -22,7 +21,6 @@ bool init_sdl(sdl_t *sdl) {
 	return true;
 }
 
-// Exit & Destroy of SDL systems
 void destroy_sdl(SDL_Renderer *renderer, SDL_Window *window) {
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);

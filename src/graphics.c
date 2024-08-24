@@ -50,36 +50,23 @@ void draw_line(SDL_Renderer *renderer, int x0, int y0, int x1, int y1) {
 	}
 }
 
-void draw_triangle(SDL_Renderer *renderer) {
-	// Calculate vertex for a triangle in the mid of screen
-	const int center_x = 640 / 2;
-	const int center_y = 320 / 2;
-	const int side_length = 320;
-	const int height_length = (sqrt(3) / 2)	* side_length;
-	vec2_t v1 = {.x = center_x, .y = center_y - height_length / 2};
-	vec2_t v2 = {.x = center_x - side_length / 2, .y = center_y + height_length / 2};
-	vec2_t v3 = {.x = center_x + side_length / 2, center_y + height_length / 2};
+void draw_triangle(SDL_Renderer *renderer, point_t v1, point_t v2, point_t v3) {
 	draw_line(renderer, v1.x, v1.y, v2.x, v2.y);
 	draw_line(renderer, v2.x, v2.y, v3.x, v3.y);
 	draw_line(renderer, v3.x, v3.y, v1.x, v1.y);	
 }
 
-int get_triangle_area(vec2_t a, vec2_t b, vec2_t c) {
+int get_triangle_area(point_t v1, point_t v2, point_t v3) {
+	// Converting points into vectors
+	vec2_t a = {.x = v1.x, .y = v1.y};
+	vec2_t b = {.x = v2.x, .y = v2.y};
+	vec2_t c = {.x = v3.x, .y = v3.y};
 	vec2_t ab = vec2_sub(a, b);
 	vec2_t ac = vec2_sub(a, c);
 	return abs(vec2_cross_product(ab, ac)) / 2;
 }
 
-void draw_filled_triangle(SDL_Renderer *renderer) {
-	// Calculate vertex for a triangle in the mid of screen
-	const int center_x = 640 / 2;
-	const int center_y = 320 / 2;
-	const int side_length = 320;
-	const int height_length = (sqrt(3) / 2)	* side_length;
-	vec2_t v1 = {.x = center_x, .y = center_y - height_length / 2};
-	vec2_t v2 = {.x = center_x - side_length / 2, .y = center_y + height_length / 2};
-	vec2_t v3 = {.x = center_x + side_length / 2, center_y + height_length / 2};
-
+void draw_filled_triangle(SDL_Renderer *renderer, point_t v1, point_t v2, point_t v3) {
 	// Get the bounding box of the triangle
 	int max_x = fmax(v1.x, fmax(v2.x, v3.x));
 	int min_x = fmin(v1.x, fmin(v2.x, v3.x));
@@ -88,19 +75,39 @@ void draw_filled_triangle(SDL_Renderer *renderer) {
 
 	int triangle_area = get_triangle_area(v1, v2, v3);
 	int area_sum = 0;
-
+	
 	// Iterate through all the pixels of bouding box
 	for (int x = min_x; x <= max_x; x++) {
 		for (int y = min_y; y <= max_y; y++) {
-			vec2_t p = {.x = x, .y = y};
+			point_t p = {.x = x, .y = y};
+			// Get the sum of area of the 3 sub triangles
 			area_sum = get_triangle_area(v1, v2, p) + get_triangle_area(v1, v3, p) + get_triangle_area(v2, v3, p);
-						
+	
+			// Get the area of the 3 sub triangles 
+			int w0 = get_triangle_area(v3, v1, p);
+			int w1 = get_triangle_area(v1, v2, p);
+			int w2 = get_triangle_area(v2, v3, p);			
+			
+			// Barycentric coordinates (how close the point is from each vertex)
+			// Dividing sub triangles area by the area of entire triangle to get weight in relation to each vertex 
+			// alpha + beta + gamma = 1
+			float alpha = w0 / (float)triangle_area; 
+			float beta  = w1 / (float)triangle_area;
+			float gamma = w2 / (float)triangle_area;
+		
+			// Get the rgb color for point based in the coordinates
+			int r = (alpha) * 0xFF + (beta) * 0x00 + (gamma) * 0x00;
+			int g = (alpha) * 0x00 + (beta) * 0xFF + (gamma) * 0x00;	
+			int b = (alpha) * 0x00 + (beta) * 0x00 + (gamma) * 0xFF;
+		
+			uint32_t interpolate_color = (r << 24) + (g << 16) + (b << 8) + (0xFF);
+	
 			/* If the sum of area of sub triangles (that point is one of vertex) 
 			   is equal to the triangle area, the point is inside of triangle
 			*/
 			if (triangle_area == area_sum) {
 				// inside triangle
-				draw_pixel(renderer, x, y, 0xFFFF00FF);
+				draw_pixel(renderer, p.x, p.y, interpolate_color);
 			}
 		}
 	}	

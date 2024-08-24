@@ -1,4 +1,3 @@
-CC=gcc
 FILES=./src/*.c
 EXE=renderer
 

@@ -21,3 +21,6 @@ day 7 (22/08/2024)
 
 day 8 (24/08/2024)
 - barycentric coordinates to interpolate colors
+
+day 9 (27/08/2024)
+- improve project structure
